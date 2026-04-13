@@ -3,10 +3,12 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start": "concurrently \"npx @tailwindcss/cli -i src/styles.css -o src/styles.compiled.css --watch\" \"ng serve\"",
+    "build": "npx @tailwindcss/cli -i src/styles.css -o src/styles.compiled.css --minify && ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "tailwind:build": "npx @tailwindcss/cli -i src/styles.css -o src/styles.compiled.css",
+    "tailwind:watch": "npx @tailwindcss/cli -i src/styles.css -o src/styles.compiled.css --watch"
   },
   "private": true,
   "packageManager": "npm@10.9.7",
@@ -17,13 +19,17 @@
     "@angular/forms": "^21.2.0",
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
+    "@tailwindcss/postcss": "^4.2.2",
+    "@tailwindcss/vite": "^4.2.2",
     "rxjs": "~7.8.0",
+    "tailwindcss": "^4.2.2",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@angular/build": "^21.2.7",
     "@angular/cli": "^21.2.7",
     "@angular/compiler-cli": "^21.2.0",
+    "concurrently": "^9.2.1",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "typescript": "~5.9.2",
