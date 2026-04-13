@@ -1,16 +1,17 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { CategoryService } from '../../../core/services/category.service';
 import { Category } from '../../../core/models/category.model';
 import { DataTableComponent, TableColumn } from '../../../shared/components/data-table/data-table.component';
-import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { tableActionIconButton } from '../../../shared/utils/table-action-icons';
 
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [NgIf, ReactiveFormsModule, DataTableComponent, ConfirmModalComponent, PageHeaderComponent],
+  imports: [NgIf, ReactiveFormsModule, RouterLink, DataTableComponent, PageHeaderComponent],
   template: `
     <app-page-header title="Categorías" description="Gestiona las categorías del catálogo">
       <button (click)="openCreate()" class="btn-primary">
@@ -63,14 +64,6 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
       </div>
     </div>
 
-    <app-confirm-modal
-      [open]="showConfirm()"
-      title="Eliminar categoría"
-      message="¿Estás seguro de que quieres eliminar esta categoría? Esta acción no se puede deshacer."
-      confirmLabel="Eliminar"
-      (confirm)="onDelete()"
-      (cancel)="showConfirm.set(false)"
-    />
   `,
   styles: [`
     .btn-primary { @apply flex items-center justify-center rounded-lg bg-[oklch(45%_0.2_260)] px-4 py-2 text-sm font-medium text-white hover:bg-[oklch(40%_0.2_260)] transition-colors disabled:opacity-60; }
@@ -87,9 +80,7 @@ export class CategoriesComponent implements OnInit {
   private fb = inject(FormBuilder);
 
   showModal = signal(false);
-  showConfirm = signal(false);
   editingId = signal<number | null>(null);
-  deletingId = signal<number | null>(null);
   saving = signal(false);
 
   form = this.fb.group({
@@ -103,24 +94,30 @@ export class CategoriesComponent implements OnInit {
     { key: 'description', label: 'Descripción' },
     {
       key: 'isActive', label: 'Estado',
-      template: (row) => `<span class="${row.isActive ? 'inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700' : 'inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600'}">${row.isActive ? 'Activa' : 'Inactiva'}</span>`
+      template: (row) => {
+        const active = row.isActive ?? true;
+        return `<span class="${active ? 'inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700' : 'inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600'}">${active ? 'Activa' : 'Inactiva'}</span>`;
+      }
     },
     {
       key: 'actions', label: 'Acciones',
-      template: (row) => `<div class="flex gap-2">
-        <button onclick="window.__editCategory(${row.id})" class="text-xs text-blue-600 hover:underline">Editar</button>
-        <button onclick="window.__deleteCategory(${row.id})" class="text-xs text-red-600 hover:underline">Eliminar</button>
-      </div>`
+      template: (row) => {
+        const active = row.isActive ?? true;
+        const toggleTitle = active ? 'Desactivar categoría' : 'Activar categoría';
+        const toggleIcon = active ? 'toggle-on' : 'toggle-off';
+        const toggleTone = active ? 'warning' : 'success';
+        return `<div class="flex items-center gap-1">
+          ${tableActionIconButton(`window.__editCategory(${row.id})`, 'Editar categoría', 'edit', 'primary')}
+          ${tableActionIconButton(`window.__toggleCategory(${row.id})`, toggleTitle, toggleIcon, toggleTone)}
+        </div>`;
+      }
     }
   ];
 
   ngOnInit() {
     this.service.loadAll();
     (window as any).__editCategory = (id: number) => this.openEdit(id);
-    (window as any).__deleteCategory = (id: number) => {
-      this.deletingId.set(id);
-      this.showConfirm.set(true);
-    };
+    (window as any).__toggleCategory = (id: number) => this.toggleActive(id);
   }
 
   openCreate() {
@@ -133,7 +130,11 @@ export class CategoriesComponent implements OnInit {
     const cat = this.service.categories().find(c => c.id === id);
     if (!cat) return;
     this.editingId.set(id);
-    this.form.patchValue(cat);
+    this.form.patchValue({
+      name: cat.name,
+      description: cat.description ?? '',
+      isActive: cat.isActive ?? true
+    });
     this.showModal.set(true);
   }
 
@@ -161,11 +162,15 @@ export class CategoriesComponent implements OnInit {
     });
   }
 
-  onDelete() {
-    if (!this.deletingId()) return;
-    this.service.delete(this.deletingId()!).subscribe({
-      next: () => this.showConfirm.set(false),
-      error: () => this.showConfirm.set(false)
+  toggleActive(id: number) {
+    const cat = this.service.categories().find(c => c.id === id);
+    if (!cat) return;
+    this.service.update(id, {
+      name: cat.name,
+      description: cat.description,
+      isActive: !(cat.isActive ?? true)
+    }).subscribe({
+      error: () => this.service.loadAll()
     });
   }
 }

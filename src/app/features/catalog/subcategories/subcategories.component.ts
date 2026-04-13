@@ -6,13 +6,13 @@ import { SubcategoryService } from '../../../core/services/subcategory.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { Subcategory } from '../../../core/models/subcategory.model';
 import { DataTableComponent, TableColumn } from '../../../shared/components/data-table/data-table.component';
-import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { tableActionIconButton } from '../../../shared/utils/table-action-icons';
 
 @Component({
   selector: 'app-subcategories',
   standalone: true,
-  imports: [NgFor, NgIf, ReactiveFormsModule, RouterLink, DataTableComponent, ConfirmModalComponent, PageHeaderComponent],
+  imports: [NgFor, NgIf, ReactiveFormsModule, RouterLink, DataTableComponent, PageHeaderComponent],
   template: `
     <app-page-header title="Subcategorías" description="Gestiona las subcategorías del catálogo">
       <button (click)="openCreate()" class="btn-primary">
@@ -69,14 +69,6 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
       </div>
     </div>
 
-    <app-confirm-modal
-      [open]="showConfirm()"
-      title="Eliminar subcategoría"
-      message="¿Estás seguro de eliminar esta subcategoría?"
-      confirmLabel="Eliminar"
-      (confirm)="onDelete()"
-      (cancel)="showConfirm.set(false)"
-    />
   `,
   styles: [`
     .btn-primary { @apply flex items-center justify-center rounded-lg bg-[oklch(45%_0.2_260)] px-4 py-2 text-sm font-medium text-white hover:bg-[oklch(40%_0.2_260)] transition-colors disabled:opacity-60; }
@@ -94,9 +86,7 @@ export class SubcategoriesComponent implements OnInit {
   private fb = inject(FormBuilder);
 
   showModal = signal(false);
-  showConfirm = signal(false);
   editingId = signal<number | null>(null);
-  deletingId = signal<number | null>(null);
   saving = signal(false);
 
   form = this.fb.group({
@@ -108,17 +98,26 @@ export class SubcategoriesComponent implements OnInit {
 
   columns: TableColumn<Subcategory>[] = [
     { key: 'name', label: 'Nombre' },
-    { key: 'categoryName', label: 'Categoría' },
+    { key: 'categoryId', label: 'Categoría', template: (row) => this.catService.categories().find(c => c.id === row.categoryId)?.name ?? '—' },
     {
       key: 'isActive', label: 'Estado',
-      template: (row) => `<span class="${row.isActive ? 'inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700' : 'inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600'}">${row.isActive ? 'Activa' : 'Inactiva'}</span>`
+      template: (row) => {
+        const active = row.isActive ?? true;
+        return `<span class="${active ? 'inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700' : 'inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600'}">${active ? 'Activa' : 'Inactiva'}</span>`;
+      }
     },
     {
       key: 'actions', label: 'Acciones',
-      template: (row) => `<div class="flex gap-2">
-        <button onclick="window.__editSub(${row.id})" class="text-xs text-blue-600 hover:underline">Editar</button>
-        <button onclick="window.__deleteSub(${row.id})" class="text-xs text-red-600 hover:underline">Eliminar</button>
-      </div>`
+      template: (row) => {
+        const active = row.isActive ?? true;
+        const toggleTitle = active ? 'Desactivar subcategoría' : 'Activar subcategoría';
+        const toggleIcon = active ? 'toggle-on' : 'toggle-off';
+        const toggleTone = active ? 'warning' : 'success';
+        return `<div class="flex items-center gap-1">
+          ${tableActionIconButton(`window.__editSub(${row.id})`, 'Editar subcategoría', 'edit', 'primary')}
+          ${tableActionIconButton(`window.__toggleSub(${row.id})`, toggleTitle, toggleIcon, toggleTone)}
+        </div>`;
+      }
     }
   ];
 
@@ -126,10 +125,7 @@ export class SubcategoriesComponent implements OnInit {
     this.service.loadAll();
     this.catService.loadAll();
     (window as any).__editSub = (id: number) => this.openEdit(id);
-    (window as any).__deleteSub = (id: number) => {
-      this.deletingId.set(id);
-      this.showConfirm.set(true);
-    };
+    (window as any).__toggleSub = (id: number) => this.toggleActive(id);
   }
 
   openCreate() {
@@ -142,7 +138,12 @@ export class SubcategoriesComponent implements OnInit {
     const item = this.service.subcategories().find(s => s.id === id);
     if (!item) return;
     this.editingId.set(id);
-    this.form.patchValue(item);
+    this.form.patchValue({
+      name: item.name,
+      description: item.description ?? '',
+      isActive: item.isActive ?? true,
+      categoryId: item.categoryId
+    });
     this.showModal.set(true);
   }
 
@@ -170,11 +171,16 @@ export class SubcategoriesComponent implements OnInit {
     });
   }
 
-  onDelete() {
-    if (!this.deletingId()) return;
-    this.service.delete(this.deletingId()!).subscribe({
-      next: () => this.showConfirm.set(false),
-      error: () => this.showConfirm.set(false)
+  toggleActive(id: number) {
+    const item = this.service.subcategories().find(s => s.id === id);
+    if (!item) return;
+    this.service.update(id, {
+      name: item.name,
+      description: item.description,
+      categoryId: item.categoryId,
+      isActive: !(item.isActive ?? true)
+    }).subscribe({
+      error: () => this.service.loadAll()
     });
   }
 }

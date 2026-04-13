@@ -3,6 +3,7 @@ import { NgFor, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { LeadService } from '../../core/services/lead.service';
+import { CourseService } from '../../core/services/course.service';
 import { StatCardComponent } from '../../shared/components/stat-card/stat-card.component';
 import { BadgeStatusComponent } from '../../shared/components/badge-status/badge-status.component';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
@@ -40,14 +41,14 @@ import { Lead } from '../../core/models/lead.model';
         />
         <app-stat-card
           title="Total Cursos"
-          [value]="summary.totalCourses"
+          [value]="courseService.courses().length"
           subtitle="Cursos disponibles"
           iconBgClass="bg-purple-500"
           [icon]="icons.courses"
         />
         <app-stat-card
           title="Compras del Mes"
-          [value]="summary.purchasesThisMonth"
+          [value]="summary.totalPurchases"
           subtitle="Este mes"
           iconBgClass="bg-amber-500"
           [icon]="icons.purchases"
@@ -76,8 +77,8 @@ import { Lead } from '../../core/models/lead.model';
             </thead>
             <tbody class="divide-y divide-[var(--color-border)]">
               <tr *ngFor="let course of topCourses()" class="hover:bg-[var(--color-muted)] transition-colors">
-                <td class="px-5 py-3 font-medium text-[var(--color-foreground)]">{{ course.name }}</td>
-                <td class="px-5 py-3 text-right text-[var(--color-muted-foreground)]">{{ course.viewCount }}</td>
+                <td class="px-5 py-3 font-medium text-[var(--color-foreground)]">{{ course.courseName }}</td>
+                <td class="px-5 py-3 text-right text-[var(--color-muted-foreground)]">{{ course.interestCount }}</td>
                 <td class="px-5 py-3 text-right">
                   <span class="inline-flex items-center rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
                     {{ course.purchaseCount }}
@@ -123,6 +124,7 @@ import { Lead } from '../../core/models/lead.model';
 export class DashboardComponent implements OnInit {
   dashboardService = inject(DashboardService);
   leadService = inject(LeadService);
+  courseService = inject(CourseService);
 
   topCourses = signal<TopCourse[]>([]);
   loadingCourses = signal(false);
@@ -138,6 +140,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.dashboardService.loadSummary();
+    this.courseService.loadAll();
     this.loadingCourses.set(true);
     this.dashboardService.loadTopCourses().subscribe({
       next: data => { this.topCourses.set(data); this.loadingCourses.set(false); },

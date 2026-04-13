@@ -6,6 +6,7 @@ import { AppUser, UserRole } from '../../core/models/user.model';
 import { DataTableComponent, TableColumn } from '../../shared/components/data-table/data-table.component';
 import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
+import { tableActionIconButton } from '../../shared/utils/table-action-icons';
 
 @Component({
   selector: 'app-users',
@@ -115,10 +116,17 @@ export class UsersComponent implements OnInit {
     },
     {
       key: 'actions', label: 'Acciones',
-      template: (row) => `<div class="flex gap-2">
-        <button onclick="window.__editUser('${row.id}')" class="text-xs text-blue-600 hover:underline">Editar</button>
-        ${row.isActive ? `<button onclick="window.__deactivateUser('${row.id}')" class="text-xs text-red-600 hover:underline">Desactivar</button>` : ''}
-      </div>`
+      template: (row) => {
+        const actions = [
+          tableActionIconButton(`window.__editUser('${row.id}')`, 'Editar usuario', 'edit', 'primary')
+        ];
+
+        if (row.isActive) {
+          actions.push(tableActionIconButton(`window.__deactivateUser('${row.id}')`, 'Desactivar usuario', 'disable', 'danger'));
+        }
+
+        return `<div class="flex items-center gap-1">${actions.join('')}</div>`;
+      }
     }
   ];
 

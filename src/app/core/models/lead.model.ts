@@ -1,12 +1,12 @@
-export type LeadStatus = 'nuevo' | 'en_conversacion' | 'convertido' | 'inactivo';
+export type LeadStatus = 'new' | 'contacted' | 'interested' | 'converted' | 'lost';
 export type LeadSource = 'whatsapp' | 'manual';
 
 export interface Lead {
   id: number;
   name: string;
-  phone: string;
+  phone?: string;
   email?: string;
-  whatsappId?: string;
+  whatsAppId?: string;
   source: LeadSource;
   status: LeadStatus;
   lastInteraction?: string;
@@ -32,7 +32,7 @@ export interface CreateLeadDto {
 
 export interface UpdateLeadDto {
   name: string;
-  phone: string;
+  phone?: string;
   email?: string;
   status: LeadStatus;
 }

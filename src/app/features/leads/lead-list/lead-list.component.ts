@@ -6,6 +6,7 @@ import { LeadService } from '../../../core/services/lead.service';
 import { Lead, LeadStatus } from '../../../core/models/lead.model';
 import { DataTableComponent, TableColumn } from '../../../shared/components/data-table/data-table.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { tableActionIconButton } from '../../../shared/utils/table-action-icons';
 
 @Component({
   selector: 'app-lead-list',
@@ -21,7 +22,7 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
       </button>
     </app-page-header>
 
-    <!-- Status filter -->
+    <!-- Status filter tabs -->
     <div class="mb-5 flex flex-wrap gap-2">
       <button
         *ngFor="let f of filters"
@@ -60,10 +61,11 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
             <div>
               <label class="form-label">Estado</label>
               <select formControlName="status" class="form-input">
-                <option value="nuevo">Nuevo</option>
-                <option value="en_conversacion">En conversación</option>
-                <option value="convertido">Convertido</option>
-                <option value="inactivo">Inactivo</option>
+                <option value="new">Nuevo</option>
+                <option value="contacted">En conversación</option>
+                <option value="interested">Interesado</option>
+                <option value="converted">Convertido</option>
+                <option value="lost">Inactivo</option>
               </select>
             </div>
             <div>
@@ -105,53 +107,56 @@ export class LeadListComponent implements OnInit {
 
   filters = [
     { label: 'Todos', value: undefined as LeadStatus | undefined },
-    { label: 'Nuevos', value: 'nuevo' as LeadStatus },
-    { label: 'En conversación', value: 'en_conversacion' as LeadStatus },
-    { label: 'Convertidos', value: 'convertido' as LeadStatus },
-    { label: 'Inactivos', value: 'inactivo' as LeadStatus }
+    { label: 'Nuevos', value: 'new' as LeadStatus },
+    { label: 'En conversación', value: 'contacted' as LeadStatus },
+    { label: 'Convertidos', value: 'converted' as LeadStatus },
+    { label: 'Inactivos', value: 'lost' as LeadStatus }
   ];
 
   form = this.fb.group({
     name: ['', Validators.required],
     phone: ['', Validators.required],
     email: [''],
-    status: ['nuevo' as LeadStatus],
+    status: ['new' as LeadStatus],
     source: ['manual']
   });
 
-  columns: TableColumn<Lead>[] = [
-    { key: 'name', label: 'Nombre' },
-    { key: 'phone', label: 'Teléfono' },
-    {
-      key: 'source', label: 'Fuente',
-      template: (row) => `<span class="${row.source === 'whatsapp' ? 'inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700' : 'inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600'}">${row.source === 'whatsapp' ? '💬 WhatsApp' : '✏️ Manual'}</span>`
-    },
-    {
-      key: 'status', label: 'Estado',
-      template: (row) => {
-        const classes: Record<string, string> = {
-          nuevo: 'bg-blue-50 text-blue-700',
-          en_conversacion: 'bg-amber-50 text-amber-700',
-          convertido: 'bg-green-50 text-green-700',
-          inactivo: 'bg-gray-100 text-gray-600'
-        };
-        const labels: Record<string, string> = {
-          nuevo: 'Nuevo', en_conversacion: 'En conversación', convertido: 'Convertido', inactivo: 'Inactivo'
-        };
-        return `<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${classes[row.status] ?? ''}">${labels[row.status] ?? row.status}</span>`;
-      }
-    },
-    {
-      key: 'lastInteraction', label: 'Última interacción',
-      template: (row) => row.lastInteraction ? new Date(row.lastInteraction).toLocaleDateString('es-MX') : '—'
-    },
-    {
-      key: 'actions', label: 'Acciones',
-      template: (row) => `<button onclick="window.__viewLead(${row.id})" class="text-xs text-blue-600 hover:underline">Ver detalle</button>`
-    }
-  ];
+  columns: TableColumn<Lead>[] = [];
 
   ngOnInit() {
+    this.columns = [
+      { key: 'name', label: 'Nombre' },
+      { key: 'phone', label: 'Teléfono', template: (row: any) => row.whatsAppId || row.phone || '—' },
+      {
+        key: 'source', label: 'Fuente',
+        template: (row) => `<span style="display:inline-flex;align-items:center;border-radius:9999px;padding:2px 10px;font-size:12px;font-weight:600;${row.source === 'whatsapp' ? 'background:#DCFCE7;color:#15803D' : 'background:#F3F4F6;color:#4B5563'}">${row.source === 'whatsapp' ? '💬 WhatsApp' : '✏️ Manual'}</span>`
+      },
+      {
+        key: 'status', label: 'Estado',
+        template: (row) => {
+          const styles: Record<string, string> = {
+            new: 'background:#EFF6FF;color:#1D4ED8',
+            contacted: 'background:#FFFBEB;color:#B45309',
+            interested: 'background:#F5F3FF;color:#7C3AED',
+            converted: 'background:#F0FDF4;color:#15803D',
+            lost: 'background:#F3F4F6;color:#4B5563'
+          };
+          const labels: Record<string, string> = {
+            new: 'Nuevo', contacted: 'En conversación', interested: 'Interesado', converted: 'Convertido', lost: 'Inactivo'
+          };
+          return `<span style="display:inline-flex;align-items:center;border-radius:9999px;padding:2px 10px;font-size:12px;font-weight:600;${styles[row.status] ?? ''}">${labels[row.status] ?? row.status}</span>`;
+        }
+      },
+      {
+        key: 'lastInteraction', label: 'Última interacción',
+        template: (row) => row.lastInteraction ? new Date(row.lastInteraction).toLocaleDateString('es-MX') : '—'
+      },
+      {
+        key: 'actions', label: 'Acciones',
+        template: (row) =>
+          `<div class="flex items-center gap-1">${tableActionIconButton(`window.__viewLead(${row.id})`, 'Ver detalle', 'view', 'primary')}</div>`
+      }
+    ];
     this.service.loadAll();
     (window as any).__viewLead = (id: number) => this.router.navigate(['/leads', id]);
   }
@@ -162,7 +167,7 @@ export class LeadListComponent implements OnInit {
   }
 
   openCreate() {
-    this.form.reset({ status: 'nuevo', source: 'manual' });
+    this.form.reset({ status: 'new', source: 'manual' });
     this.showModal.set(true);
   }
 

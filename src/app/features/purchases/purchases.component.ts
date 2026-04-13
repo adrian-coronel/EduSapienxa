@@ -141,7 +141,7 @@ export class PurchasesComponent implements OnInit {
     if (!q) { this.filteredLeads.set([]); return; }
     this.filteredLeads.set(
       this.leadService.leads().filter(l =>
-        l.name.toLowerCase().includes(q) || l.phone.includes(q)
+        l.name.toLowerCase().includes(q) || (l.phone ?? l.whatsAppId ?? '').toLowerCase().includes(q)
       ).slice(0, 5)
     );
   }

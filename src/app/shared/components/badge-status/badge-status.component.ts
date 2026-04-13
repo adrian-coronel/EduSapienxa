@@ -1,7 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { NgClass } from '@angular/common';
+import { LeadStatus } from '../../../core/models/lead.model';
 
-type Status = 'nuevo' | 'en_conversacion' | 'convertido' | 'inactivo' | 'active' | 'inactive' | 'admin' | 'editor';
+type Status = LeadStatus | 'active' | 'inactive' | 'admin' | 'editor';
 
 @Component({
   selector: 'app-badge-status',
@@ -18,14 +19,15 @@ type Status = 'nuevo' | 'en_conversacion' | 'convertido' | 'inactivo' | 'active'
   `
 })
 export class BadgeStatusComponent {
-  @Input() status: Status = 'nuevo';
+  @Input() status: Status = 'new';
 
   get label(): string {
     const labels: Record<Status, string> = {
-      nuevo: 'Nuevo',
-      en_conversacion: 'En conversación',
-      convertido: 'Convertido',
-      inactivo: 'Inactivo',
+      new: 'Nuevo',
+      contacted: 'En conversación',
+      interested: 'Interesado',
+      converted: 'Convertido',
+      lost: 'Inactivo',
       active: 'Activo',
       inactive: 'Inactivo',
       admin: 'Admin',
@@ -36,10 +38,11 @@ export class BadgeStatusComponent {
 
   get badgeClass(): string {
     const classes: Record<Status, string> = {
-      nuevo: 'bg-blue-50 text-blue-700',
-      en_conversacion: 'bg-amber-50 text-amber-700',
-      convertido: 'bg-green-50 text-green-700',
-      inactivo: 'bg-gray-100 text-gray-600',
+      new: 'bg-blue-50 text-blue-700',
+      contacted: 'bg-amber-50 text-amber-700',
+      interested: 'bg-violet-50 text-violet-700',
+      converted: 'bg-green-50 text-green-700',
+      lost: 'bg-gray-100 text-gray-600',
       active: 'bg-green-50 text-green-700',
       inactive: 'bg-gray-100 text-gray-600',
       admin: 'bg-purple-50 text-purple-700',
@@ -50,10 +53,11 @@ export class BadgeStatusComponent {
 
   get dotClass(): string {
     const dots: Record<Status, string> = {
-      nuevo: 'bg-blue-500',
-      en_conversacion: 'bg-amber-500',
-      convertido: 'bg-green-500',
-      inactivo: 'bg-gray-400',
+      new: 'bg-blue-500',
+      contacted: 'bg-amber-500',
+      interested: 'bg-violet-500',
+      converted: 'bg-green-500',
+      lost: 'bg-gray-400',
       active: 'bg-green-500',
       inactive: 'bg-gray-400',
       admin: 'bg-purple-500',

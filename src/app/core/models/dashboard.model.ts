@@ -1,13 +1,13 @@
 export interface DashboardSummary {
   totalLeads: number;
   convertedLeads: number;
-  totalCourses: number;
-  purchasesThisMonth: number;
+  totalPurchases: number;
+  totalRevenue: number;
 }
 
 export interface TopCourse {
-  id: number;
-  name: string;
-  viewCount: number;
+  courseId: number;
+  courseName: string;
+  interestCount: number;
   purchaseCount: number;
 }

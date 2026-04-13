@@ -70,10 +70,11 @@ import { BadgeStatusComponent } from '../../../shared/components/badge-status/ba
                 (change)="onStatusChange($event)"
                 class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] focus:outline-none focus:ring-2 focus:ring-[oklch(45%_0.2_260)]"
               >
-                <option value="nuevo">Nuevo</option>
-                <option value="en_conversacion">En conversación</option>
-                <option value="convertido">Convertido</option>
-                <option value="inactivo">Inactivo</option>
+                <option value="new">Nuevo</option>
+                <option value="contacted">En conversación</option>
+                <option value="interested">Interesado</option>
+                <option value="converted">Convertido</option>
+                <option value="lost">Inactivo</option>
               </select>
             </div>
           </div>

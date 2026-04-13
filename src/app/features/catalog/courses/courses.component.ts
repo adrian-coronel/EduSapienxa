@@ -6,13 +6,13 @@ import { CourseService } from '../../../core/services/course.service';
 import { SubcategoryService } from '../../../core/services/subcategory.service';
 import { Course } from '../../../core/models/course.model';
 import { DataTableComponent, TableColumn } from '../../../shared/components/data-table/data-table.component';
-import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { tableActionIconButton } from '../../../shared/utils/table-action-icons';
 
 @Component({
   selector: 'app-courses',
   standalone: true,
-  imports: [NgFor, NgIf, ReactiveFormsModule, RouterLink, DataTableComponent, ConfirmModalComponent, PageHeaderComponent],
+  imports: [NgFor, NgIf, ReactiveFormsModule, RouterLink, DataTableComponent, PageHeaderComponent],
   template: `
     <app-page-header title="Cursos" description="Gestiona el catálogo de cursos">
       <button (click)="openCreate()" class="btn-primary">
@@ -90,14 +90,6 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
       </div>
     </div>
 
-    <app-confirm-modal
-      [open]="showConfirm()"
-      title="Eliminar curso"
-      message="¿Estás seguro de eliminar este curso?"
-      confirmLabel="Eliminar"
-      (confirm)="onDelete()"
-      (cancel)="showConfirm.set(false)"
-    />
   `,
   styles: [`
     .btn-primary { @apply flex items-center justify-center rounded-lg bg-[oklch(45%_0.2_260)] px-4 py-2 text-sm font-medium text-white hover:bg-[oklch(40%_0.2_260)] transition-colors disabled:opacity-60; }
@@ -115,9 +107,7 @@ export class CoursesComponent implements OnInit {
   private fb = inject(FormBuilder);
 
   showModal = signal(false);
-  showConfirm = signal(false);
   editingId = signal<number | null>(null);
-  deletingId = signal<number | null>(null);
   saving = signal(false);
   selectedSubIds = signal<number[]>([]);
 
@@ -141,14 +131,23 @@ export class CoursesComponent implements OnInit {
     },
     {
       key: 'isActive', label: 'Estado',
-      template: (row) => `<span class="${row.isActive ? 'inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700' : 'inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600'}">${row.isActive ? 'Activo' : 'Inactivo'}</span>`
+      template: (row) => {
+        const active = row.isActive ?? true;
+        return `<span class="${active ? 'inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700' : 'inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600'}">${active ? 'Activo' : 'Inactivo'}</span>`;
+      }
     },
     {
       key: 'actions', label: 'Acciones',
-      template: (row) => `<div class="flex gap-2">
-        <button onclick="window.__editCourse(${row.id})" class="text-xs text-blue-600 hover:underline">Editar</button>
-        <button onclick="window.__deleteCourse(${row.id})" class="text-xs text-red-600 hover:underline">Eliminar</button>
-      </div>`
+      template: (row) => {
+        const active = row.isActive ?? true;
+        const toggleTitle = active ? 'Desactivar curso' : 'Activar curso';
+        const toggleIcon = active ? 'toggle-on' : 'toggle-off';
+        const toggleTone = active ? 'warning' : 'success';
+        return `<div class="flex items-center gap-1">
+          ${tableActionIconButton(`window.__editCourse(${row.id})`, 'Editar curso', 'edit', 'primary')}
+          ${tableActionIconButton(`window.__toggleCourse(${row.id})`, toggleTitle, toggleIcon, toggleTone)}
+        </div>`;
+      }
     }
   ];
 
@@ -156,10 +155,7 @@ export class CoursesComponent implements OnInit {
     this.service.loadAll();
     this.subService.loadAll();
     (window as any).__editCourse = (id: number) => this.openEdit(id);
-    (window as any).__deleteCourse = (id: number) => {
-      this.deletingId.set(id);
-      this.showConfirm.set(true);
-    };
+    (window as any).__toggleCourse = (id: number) => this.toggleActive(id);
   }
 
   isSubSelected(id: number) {
@@ -187,7 +183,13 @@ export class CoursesComponent implements OnInit {
     if (!course) return;
     this.editingId.set(id);
     this.selectedSubIds.set(course.subcategoryIds ?? []);
-    this.form.patchValue(course);
+    this.form.patchValue({
+      name: course.name,
+      description: course.description ?? '',
+      price: course.price,
+      checkoutUrl: course.checkoutUrl,
+      isActive: course.isActive ?? true
+    });
     this.showModal.set(true);
   }
 
@@ -215,11 +217,18 @@ export class CoursesComponent implements OnInit {
     });
   }
 
-  onDelete() {
-    if (!this.deletingId()) return;
-    this.service.delete(this.deletingId()!).subscribe({
-      next: () => this.showConfirm.set(false),
-      error: () => this.showConfirm.set(false)
+  toggleActive(id: number) {
+    const course = this.service.courses().find(c => c.id === id);
+    if (!course) return;
+    this.service.update(id, {
+      name: course.name,
+      description: course.description,
+      price: course.price,
+      checkoutUrl: course.checkoutUrl,
+      subcategoryIds: course.subcategoryIds ?? [],
+      isActive: !(course.isActive ?? true)
+    }).subscribe({
+      error: () => this.service.loadAll()
     });
   }
 }
