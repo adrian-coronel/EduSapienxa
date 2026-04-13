@@ -289,3 +289,10 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: oklch(70% 0.01 250); border-radius: 999px; }
 .dark ::-webkit-scrollbar-thumb { background: oklch(40% 0.02 253); }
+
+/* ── Layout Classes ── */
+.layout-content { padding-left: 0; }
+@media (min-width: 1024px) {
+  .layout-content { padding-left: var(--sidebar-w); }
+  .layout-content.sidebar-collapsed { padding-left: var(--sidebar-w-collapsed); }
+}

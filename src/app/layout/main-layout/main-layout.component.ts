@@ -11,21 +11,21 @@ import { NgStyle } from '@angular/common';
   template: `
     <div class="flex min-h-screen bg-[var(--color-background)]">
 
-      <!-- Sidebar receives mobileOpen, emits collapse changes -->
+      <!-- Sidebar recibe mobileOpen, emite cambios de colapso -->
       <app-sidebar
         [mobileOpen]="mobileOpen()"
         (mobileOpenChange)="mobileOpen.set($event)"
         (collapsedChange)="sidebarCollapsed.set($event)"
       />
 
-      <!-- Content area offsets left by sidebar width -->
+      <!-- En móvil: sidebar es overlay, sin padding. En lg+: deja espacio al sidebar fijo. -->
       <div
-        class="flex flex-1 flex-col min-w-0 transition-[padding] duration-300 ease-in-out"
-        [ngStyle]="{ 'padding-left': sidebarCollapsed() ? 'var(--sidebar-w-collapsed)' : 'var(--sidebar-w)' }"
+        class="layout-content flex flex-1 flex-col min-w-0 transition-[padding] duration-300 ease-in-out"
+        [class.sidebar-collapsed]="sidebarCollapsed()"
       >
         <app-topbar (menuToggle)="mobileOpen.set(!mobileOpen())" />
 
-        <main class="flex-1 p-4 lg:p-6">
+        <main class="flex-1 p-4 lg:p-6 max-w-full overflow-x-hidden">
           <router-outlet />
         </main>
       </div>

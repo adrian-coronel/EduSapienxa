@@ -129,22 +129,24 @@ import { BadgeStatusComponent } from '../../../shared/components/badge-status/ba
               <div *ngIf="!purchases().length" class="py-6 text-center text-sm text-[var(--color-muted-foreground)]">
                 Sin compras registradas.
               </div>
-              <table *ngIf="purchases().length" class="w-full text-sm">
-                <thead class="bg-[var(--color-muted)]">
-                  <tr>
-                    <th class="px-3 py-2 text-left text-xs font-semibold text-[var(--color-muted-foreground)]">Curso</th>
-                    <th class="px-3 py-2 text-right text-xs font-semibold text-[var(--color-muted-foreground)]">Monto</th>
-                    <th class="px-3 py-2 text-right text-xs font-semibold text-[var(--color-muted-foreground)]">Fecha</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-[var(--color-border)]">
-                  <tr *ngFor="let p of purchases()">
-                    <td class="px-3 py-2 text-[var(--color-foreground)]">{{ p.course?.name || '—' }}</td>
-                    <td class="px-3 py-2 text-right font-semibold text-green-600">{{ p.amountPaid | currency:'MXN' }}</td>
-                    <td class="px-3 py-2 text-right text-[var(--color-muted-foreground)]">{{ p.purchasedAt | date:'dd/MM/yy' }}</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div *ngIf="purchases().length" class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead class="bg-[var(--color-muted)]">
+                    <tr>
+                      <th class="px-3 py-2 text-left text-xs font-semibold text-[var(--color-muted-foreground)] whitespace-nowrap">Curso</th>
+                      <th class="px-3 py-2 text-right text-xs font-semibold text-[var(--color-muted-foreground)] whitespace-nowrap">Monto</th>
+                      <th class="px-3 py-2 text-right text-xs font-semibold text-[var(--color-muted-foreground)] whitespace-nowrap">Fecha</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-[var(--color-border)]">
+                    <tr *ngFor="let p of purchases()">
+                      <td class="px-3 py-2 text-[var(--color-foreground)] whitespace-nowrap">{{ p.course?.name || '—' }}</td>
+                      <td class="px-3 py-2 text-right font-semibold text-green-600 whitespace-nowrap">{{ p.amountPaid | currency:'MXN' }}</td>
+                      <td class="px-3 py-2 text-right text-[var(--color-muted-foreground)] whitespace-nowrap">{{ p.purchasedAt | date:'dd/MM/yy' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -154,7 +156,7 @@ import { BadgeStatusComponent } from '../../../shared/components/badge-status/ba
     <!-- Interest modal -->
     <div *ngIf="showInterestModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-black/50" (click)="showInterestModal.set(false)"></div>
-      <div class="relative w-full max-w-md rounded-xl bg-[var(--color-card)] p-6 shadow-xl">
+      <div class="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-[var(--color-card)] p-6 shadow-xl">
         <h3 class="mb-4 text-lg font-semibold text-[var(--color-foreground)]">Registrar interés</h3>
         <form [formGroup]="interestForm" (ngSubmit)="onAddInterest()" class="space-y-4">
           <div>
@@ -179,7 +181,7 @@ import { BadgeStatusComponent } from '../../../shared/components/badge-status/ba
     <!-- Purchase modal -->
     <div *ngIf="showPurchaseModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-black/50" (click)="showPurchaseModal.set(false)"></div>
-      <div class="relative w-full max-w-md rounded-xl bg-[var(--color-card)] p-6 shadow-xl">
+      <div class="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-[var(--color-card)] p-6 shadow-xl">
         <h3 class="mb-4 text-lg font-semibold text-[var(--color-foreground)]">Registrar compra</h3>
         <form [formGroup]="purchaseForm" (ngSubmit)="onAddPurchase()" class="space-y-4">
           <div>
