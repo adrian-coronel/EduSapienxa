@@ -9,15 +9,15 @@ export interface Lead {
   whatsAppId?: string;
   source: LeadSource;
   status: LeadStatus;
-  lastInteraction?: string;
+  lastInteraction?: string | null;
   interests?: LeadInterest[];
 }
 
 export interface LeadInterest {
   id: number;
   leadId: number;
-  courseId: number;
-  courseName: string;
+  courseId?: number;
+  course?: { id: number; name: string; price: number; description?: string };
   notes?: string;
   createdAt: string;
 }

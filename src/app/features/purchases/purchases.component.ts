@@ -5,6 +5,7 @@ import { PurchaseService } from '../../core/services/purchase.service';
 import { LeadService } from '../../core/services/lead.service';
 import { CourseService } from '../../core/services/course.service';
 import { Purchase } from '../../core/models/purchase.model';
+import { Lead } from '../../core/models/lead.model';
 import { DataTableComponent, TableColumn } from '../../shared/components/data-table/data-table.component';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 
@@ -38,7 +39,7 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
                 [(ngModel)]="leadSearch"
                 type="text"
                 class="form-input"
-                placeholder="Buscar por nombre o teléfono..."
+                placeholder="Buscar por nombre, WhatsApp o email..."
                 (input)="filterLeads()"
               />
               <div *ngIf="filteredLeads().length && leadSearch" class="absolute z-10 mt-1 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] shadow-lg max-h-40 overflow-y-auto">
@@ -49,7 +50,7 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
                   class="flex w-full items-center justify-between px-3 py-2 text-sm hover:bg-[var(--color-muted)] transition-colors"
                 >
                   <span class="text-[var(--color-foreground)]">{{ lead.name }}</span>
-                  <span class="text-xs text-[var(--color-muted-foreground)]">{{ lead.phone }}</span>
+                  <span class="text-xs text-[var(--color-muted-foreground)]">{{ lead.whatsAppId || lead.phone || lead.email || 'Sin contacto' }}</span>
                 </button>
               </div>
             </div>
@@ -107,7 +108,7 @@ export class PurchasesComponent implements OnInit {
   showModal = signal(false);
   saving = signal(false);
   leadSearch = '';
-  filteredLeads = signal<any[]>([]);
+  filteredLeads = signal<Lead[]>([]);
 
   form = this.fb.group({
     leadId: [null as number | null, Validators.required],
@@ -117,17 +118,26 @@ export class PurchasesComponent implements OnInit {
   });
 
   columns: TableColumn<Purchase>[] = [
-    { key: 'leadName', label: 'Lead' },
-    { key: 'courseName', label: 'Curso' },
+    {
+      key: 'lead', label: 'Lead',
+      template: (row) => row.lead?.name ?? '—'
+    },
+    {
+      key: 'course', label: 'Curso',
+      template: (row) => row.course?.name ?? '—'
+    },
     {
       key: 'amountPaid', label: 'Monto',
       template: (row) => `<span class="font-semibold text-green-600">$${row.amountPaid.toFixed(2)}</span>`
     },
     {
-      key: 'purchaseDate', label: 'Fecha',
-      template: (row) => new Date(row.purchaseDate).toLocaleDateString('es-MX')
+      key: 'purchasedAt', label: 'Fecha',
+      template: (row) => new Date(row.purchasedAt).toLocaleDateString('es-MX')
     },
-    { key: 'registeredBy', label: 'Registrado por' }
+    {
+      key: 'registeredBy', label: 'Registrado por',
+      template: (row) => row.registeredBy?.name ?? '—'
+    }
   ];
 
   ngOnInit() {
@@ -141,7 +151,10 @@ export class PurchasesComponent implements OnInit {
     if (!q) { this.filteredLeads.set([]); return; }
     this.filteredLeads.set(
       this.leadService.leads().filter(l =>
-        l.name.toLowerCase().includes(q) || (l.phone ?? l.whatsAppId ?? '').toLowerCase().includes(q)
+        l.name.toLowerCase().includes(q) ||
+        (l.whatsAppId ?? '').toLowerCase().includes(q) ||
+        (l.phone ?? '').toLowerCase().includes(q) ||
+        (l.email ?? '').toLowerCase().includes(q)
       ).slice(0, 5)
     );
   }

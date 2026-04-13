@@ -110,7 +110,7 @@ import { BadgeStatusComponent } from '../../../shared/components/badge-status/ba
               <li *ngFor="let interest of sortedInterests()" class="ml-4">
                 <div class="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full border border-white bg-[oklch(45%_0.2_260)]"></div>
                 <p class="text-xs text-[var(--color-muted-foreground)]">{{ interest.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
-                <p class="text-sm font-medium text-[var(--color-foreground)]">{{ interest.courseName }}</p>
+                <p class="text-sm font-medium text-[var(--color-foreground)]">{{ interest.course?.name ?? 'Curso sin nombre' }}</p>
                 <p *ngIf="interest.notes" class="text-xs text-[var(--color-muted-foreground)]">{{ interest.notes }}</p>
               </li>
             </ol>
@@ -139,9 +139,9 @@ import { BadgeStatusComponent } from '../../../shared/components/badge-status/ba
                 </thead>
                 <tbody class="divide-y divide-[var(--color-border)]">
                   <tr *ngFor="let p of purchases()">
-                    <td class="px-3 py-2 text-[var(--color-foreground)]">{{ p.courseName }}</td>
+                    <td class="px-3 py-2 text-[var(--color-foreground)]">{{ p.course?.name || '—' }}</td>
                     <td class="px-3 py-2 text-right font-semibold text-green-600">{{ p.amountPaid | currency:'MXN' }}</td>
-                    <td class="px-3 py-2 text-right text-[var(--color-muted-foreground)]">{{ p.purchaseDate | date:'dd/MM/yy' }}</td>
+                    <td class="px-3 py-2 text-right text-[var(--color-muted-foreground)]">{{ p.purchasedAt | date:'dd/MM/yy' }}</td>
                   </tr>
                 </tbody>
               </table>

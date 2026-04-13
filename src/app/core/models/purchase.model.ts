@@ -1,13 +1,36 @@
+import { AppUser } from './user.model';
+
+export interface PurchaseLeadRef {
+  id: number;
+  name: string;
+  email?: string;
+  whatsAppId?: string;
+  status?: string;
+  source?: string;
+}
+
+export interface PurchaseCourseRef {
+  id: number;
+  name: string;
+  description?: string;
+  price: number;
+  checkoutUrl?: string;
+  isActive?: boolean;
+}
+
 export interface Purchase {
   id: number;
   leadId: number;
-  leadName: string;
   courseId: number;
-  courseName: string;
   amountPaid: number;
+  registeredById: string;
   notes?: string;
-  purchaseDate: string;
-  registeredBy: string;
+  purchasedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  lead?: PurchaseLeadRef;
+  course?: PurchaseCourseRef;
+  registeredBy?: AppUser;
 }
 
 export interface CreatePurchaseDto {
