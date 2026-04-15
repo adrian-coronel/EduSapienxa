@@ -2,12 +2,10 @@ import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { TopbarComponent } from '../topbar/topbar.component';
-import { NgStyle } from '@angular/common';
-
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [RouterOutlet, SidebarComponent, TopbarComponent, NgStyle],
+  imports: [RouterOutlet, SidebarComponent, TopbarComponent],
   template: `
     <div class="flex min-h-screen bg-[var(--color-background)]">
 

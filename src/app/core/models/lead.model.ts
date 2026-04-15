@@ -9,6 +9,7 @@ export interface Lead {
   whatsAppId?: string;
   source: LeadSource;
   status: LeadStatus;
+  notes?: string;
   lastInteraction?: string | null;
   interests?: LeadInterest[];
 }
@@ -32,9 +33,10 @@ export interface CreateLeadDto {
 
 export interface UpdateLeadDto {
   name: string;
-  phone?: string;
   email?: string;
+  whatsAppId?: string;
   status: LeadStatus;
+  notes?: string;
 }
 
 export interface CreateLeadInterestDto {
