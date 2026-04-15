@@ -1,4 +1,4 @@
-# sapienxa-landingpage
+# EduSapienxa
 
 Repositorio monorepo de **EduSapienxa**, compuesto por:
 
@@ -14,7 +14,7 @@ Repositorio monorepo de **EduSapienxa**, compuesto por:
 ## Estructura
 
 ```text
-sapienxa-landingpage/
+EduSapienxa/
 ├─ EduSapienxa.Web/
 └─ EduSapienxa.API/
 ```
