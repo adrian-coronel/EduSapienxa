@@ -1,13 +1,24 @@
 export interface DashboardSummary {
   totalLeads: number;
-  convertedLeads: number;
-  totalPurchases: number;
+  totalEnrollments: number;
+  convertedEnrollments: number;
+  pendingValidations: number;
   totalRevenue: number;
+  topCourses: TopCourse[];
+  recentLeads: RecentLead[];
 }
 
 export interface TopCourse {
-  courseId: number;
-  courseName: string;
-  interestCount: number;
-  purchaseCount: number;
+  catalogItemId: string;
+  title: string;
+  enrollmentCount: number;
+  revenue: number;
+}
+
+export interface RecentLead {
+  id: string;
+  name?: string;
+  phoneNumber: string;
+  status: string;
+  contactMethod?: string;
 }

@@ -62,12 +62,12 @@ interface NavGroup {
           <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center
                        rounded-lg bg-[var(--color-primary)] text-white
                        font-bold text-xs tracking-tight select-none">
-            ES
+            AS
           </span>
           <span *ngIf="!collapsed()"
                 class="text-[15px] font-bold tracking-tight truncate
                        text-[var(--color-sidebar-text)]">
-            Edu<span class="text-[var(--color-primary)]">Sapienxa</span>
+            Agent<span class="text-[var(--color-primary)]">Sapienxa</span>
           </span>
         </a>
 
@@ -218,27 +218,19 @@ export class SidebarComponent {
       label: 'Catálogo',
       items: [
         {
-          label: 'Categorías',
-          route: '/catalog/categories',
-          icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
-                   <path stroke-linecap="round" stroke-linejoin="round"
-                     d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/>
-                 </svg>`
-        },
-        {
-          label: 'Subcategorías',
-          route: '/catalog/subcategories',
-          icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
-                   <path stroke-linecap="round" stroke-linejoin="round"
-                     d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
-                 </svg>`
-        },
-        {
           label: 'Cursos',
-          route: '/catalog/courses',
+          route: '/catalog',
           icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
                    <path stroke-linecap="round" stroke-linejoin="round"
                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                 </svg>`
+        },
+        {
+          label: 'Instructores',
+          route: '/instructors',
+          icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                   <path stroke-linecap="round" stroke-linejoin="round"
+                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                  </svg>`
         }
       ]
@@ -255,18 +247,34 @@ export class SidebarComponent {
                  </svg>`
         },
         {
-          label: 'Compras',
-          route: '/purchases',
+          label: 'Inscripciones',
+          route: '/enrollments',
           icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
                    <path stroke-linecap="round" stroke-linejoin="round"
-                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                 </svg>`
+        },
+        {
+          label: 'Pagos',
+          route: '/payments',
+          icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                   <path stroke-linecap="round" stroke-linejoin="round"
+                     d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
                  </svg>`
         }
       ]
     },
     {
-      label: 'Admin',
+      label: 'Sistema',
       items: [
+        {
+          label: 'Agentes IA',
+          route: '/agents',
+          icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                   <path stroke-linecap="round" stroke-linejoin="round"
+                     d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H4a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-1"/>
+                 </svg>`
+        },
         {
           label: 'Usuarios',
           route: '/users',

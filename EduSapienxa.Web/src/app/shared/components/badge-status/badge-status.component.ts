@@ -1,8 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { LeadStatus } from '../../../core/models/lead.model';
 
-type Status = LeadStatus | 'active' | 'inactive' | 'admin' | 'editor';
+type Status = 'New' | 'Interesado' | 'EscaladoAHumano' | 'Pendiente Pago' | 'Pagado' | 'Inactivo' | 'active' | 'inactive' | 'admin' | 'editor';
 
 @Component({
   selector: 'app-badge-status',
@@ -19,15 +18,16 @@ type Status = LeadStatus | 'active' | 'inactive' | 'admin' | 'editor';
   `
 })
 export class BadgeStatusComponent {
-  @Input() status: Status = 'new';
+  @Input() status: Status = 'New';
 
   get label(): string {
     const labels: Record<Status, string> = {
-      new: 'Nuevo',
-      contacted: 'En conversación',
-      interested: 'Interesado',
-      converted: 'Convertido',
-      lost: 'Inactivo',
+      'New': 'Nuevo',
+      'Interesado': 'Interesado',
+      'EscaladoAHumano': 'Escalado',
+      'Pendiente Pago': 'Pendiente Pago',
+      'Pagado': 'Pagado',
+      'Inactivo': 'Inactivo',
       active: 'Activo',
       inactive: 'Inactivo',
       admin: 'Admin',
@@ -38,11 +38,12 @@ export class BadgeStatusComponent {
 
   get badgeClass(): string {
     const classes: Record<Status, string> = {
-      new: 'bg-blue-50 text-blue-700',
-      contacted: 'bg-amber-50 text-amber-700',
-      interested: 'bg-violet-50 text-violet-700',
-      converted: 'bg-green-50 text-green-700',
-      lost: 'bg-gray-100 text-gray-600',
+      'New': 'bg-blue-50 text-blue-700',
+      'Interesado': 'bg-violet-50 text-violet-700',
+      'EscaladoAHumano': 'bg-orange-50 text-orange-700',
+      'Pendiente Pago': 'bg-yellow-50 text-yellow-700',
+      'Pagado': 'bg-green-50 text-green-700',
+      'Inactivo': 'bg-gray-100 text-gray-600',
       active: 'bg-green-50 text-green-700',
       inactive: 'bg-gray-100 text-gray-600',
       admin: 'bg-purple-50 text-purple-700',
@@ -53,11 +54,12 @@ export class BadgeStatusComponent {
 
   get dotClass(): string {
     const dots: Record<Status, string> = {
-      new: 'bg-blue-500',
-      contacted: 'bg-amber-500',
-      interested: 'bg-violet-500',
-      converted: 'bg-green-500',
-      lost: 'bg-gray-400',
+      'New': 'bg-blue-500',
+      'Interesado': 'bg-violet-500',
+      'EscaladoAHumano': 'bg-orange-500',
+      'Pendiente Pago': 'bg-yellow-500',
+      'Pagado': 'bg-green-500',
+      'Inactivo': 'bg-gray-400',
       active: 'bg-green-500',
       inactive: 'bg-gray-400',
       admin: 'bg-purple-500',

@@ -22,24 +22,13 @@ export const routes: Routes = [
       },
       {
         path: 'catalog',
-        children: [
-          { path: '', redirectTo: 'categories', pathMatch: 'full' },
-          {
-            path: 'categories',
-            loadComponent: () =>
-              import('./features/catalog/categories/categories.component').then(m => m.CategoriesComponent)
-          },
-          {
-            path: 'subcategories',
-            loadComponent: () =>
-              import('./features/catalog/subcategories/subcategories.component').then(m => m.SubcategoriesComponent)
-          },
-          {
-            path: 'courses',
-            loadComponent: () =>
-              import('./features/catalog/courses/courses.component').then(m => m.CoursesComponent)
-          }
-        ]
+        loadComponent: () =>
+          import('./features/catalog/catalog.component').then(m => m.CatalogComponent)
+      },
+      {
+        path: 'instructors',
+        loadComponent: () =>
+          import('./features/instructors/instructors.component').then(m => m.InstructorsComponent)
       },
       {
         path: 'leads',
@@ -57,9 +46,19 @@ export const routes: Routes = [
         ]
       },
       {
-        path: 'purchases',
+        path: 'enrollments',
         loadComponent: () =>
-          import('./features/purchases/purchases.component').then(m => m.PurchasesComponent)
+          import('./features/enrollments/enrollments.component').then(m => m.EnrollmentsComponent)
+      },
+      {
+        path: 'payments',
+        loadComponent: () =>
+          import('./features/payments/payments.component').then(m => m.PaymentsComponent)
+      },
+      {
+        path: 'agents',
+        loadComponent: () =>
+          import('./features/agents/agents.component').then(m => m.AgentsComponent)
       },
       {
         path: 'users',

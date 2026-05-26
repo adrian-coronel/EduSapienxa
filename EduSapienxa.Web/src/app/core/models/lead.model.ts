@@ -1,45 +1,33 @@
-export type LeadStatus = 'new' | 'contacted' | 'interested' | 'converted' | 'lost';
-export type LeadSource = 'whatsapp' | 'manual';
+export type LeadStatus = 'New' | 'Interesado' | 'EscaladoAHumano';
 
 export interface Lead {
-  id: number;
-  name: string;
-  phone?: string;
+  id: string;
+  name?: string;
   email?: string;
-  whatsAppId?: string;
-  source: LeadSource;
-  status: LeadStatus;
-  notes?: string;
-  lastInteraction?: string | null;
-  interests?: LeadInterest[];
+  phoneNumber: string;
+  contactMethod?: string;
+  status: string;
+  salesAgentId?: string;
+  salesAgentName?: string;
 }
 
-export interface LeadInterest {
-  id: number;
-  leadId: number;
-  courseId?: number;
-  course?: { id: number; name: string; price: number; description?: string };
-  notes?: string;
-  createdAt: string;
+export interface LeadDetail extends Lead {
+  salesAgent?: { id: string; agentName: string; email?: string };
+  enrollments?: LeadEnrollment[];
 }
 
-export interface CreateLeadDto {
-  name: string;
-  phone: string;
-  email?: string;
-  source: LeadSource;
-  status: LeadStatus;
+export interface LeadEnrollment {
+  id: string;
+  status: string;
+  totalCost?: number;
+  voucher?: string;
+  observation?: string;
+  catalogItemId: string;
+  courseTitle?: string;
 }
 
 export interface UpdateLeadDto {
-  name: string;
+  name?: string;
   email?: string;
-  whatsAppId?: string;
-  status: LeadStatus;
-  notes?: string;
-}
-
-export interface CreateLeadInterestDto {
-  courseId: number;
-  notes?: string;
+  salesAgentId?: string;
 }

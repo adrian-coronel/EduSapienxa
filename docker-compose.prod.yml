@@ -1,50 +1,5 @@
 services:
 
-  # ── PostgreSQL ─────────────────────────────────────────
-  postgres:
-    image: postgres:16-alpine
-    container_name: edusapienxa-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # ── API .NET ────────────────────────────────────────────
-  api:
-    build:
-      context: ./EduSapienxa.API
-      dockerfile: Dockerfile
-    container_name: edusapienxa-api
-    restart: unless-stopped
-    expose:
-      - "8080"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:8080
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-      - Jwt__Key=${JWT_KEY}
-      - Jwt__Issuer=EduSapienxa
-      - Jwt__Audience=EduSapienxa
-      - Cors__AllowedOrigins__0=https://edusapienxa.dludena.digital
-    depends_on:
-      postgres:
-        condition: service_healthy
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.edusapienxa-api.rule=Host(`api.edusapienxa.dludena.digital`)"
-      - "traefik.http.routers.edusapienxa-api.entrypoints=websecure"
-      - "traefik.http.routers.edusapienxa-api.tls.certresolver=letsencrypt"
-      - "traefik.http.services.edusapienxa-api.loadbalancer.server.port=8080"
-      - "traefik.docker.network=proxy-network"
-
   # ── Angular ─────────────────────────────────────────────
   frontend:
     build:
@@ -54,8 +9,6 @@ services:
     restart: unless-stopped
     expose:
       - "80"
-    depends_on:
-      - api
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.edusapienxa-web.rule=Host(`edusapienxa.dludena.digital`)"
@@ -63,9 +16,6 @@ services:
       - "traefik.http.routers.edusapienxa-web.tls.certresolver=letsencrypt"
       - "traefik.http.services.edusapienxa-web.loadbalancer.server.port=80"
       - "traefik.docker.network=proxy-network"
-
-volumes:
-  postgres_data:
 
 networks:
   default:

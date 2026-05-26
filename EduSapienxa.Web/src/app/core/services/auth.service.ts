@@ -18,7 +18,7 @@ export class AuthService {
   isAuthenticated = computed(() => !!this._token());
 
   login(dto: LoginRequest) {
-    return this.http.post<LoginResponse>(`${this.env.apiUrl}/auth/login`, dto).pipe(
+    return this.http.post<LoginResponse>(`${this.env.apiUrl}/admin/auth/login`, dto).pipe(
       tap(res => {
         localStorage.setItem('token', res.token);
         this._token.set(res.token);

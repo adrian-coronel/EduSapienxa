@@ -170,10 +170,13 @@ export class UsersComponent implements OnInit {
   onSubmit() {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.saving.set(true);
-    const dto = this.form.value as any;
+    const val = this.form.value as any;
     const obs = this.editingId()
-      ? this.service.update(this.editingId()!, dto)
-      : this.service.create(dto);
+      ? this.service.update(this.editingId()!, {
+          name: val.name, email: val.email, role: val.role,
+          isActive: true, password: val.password || undefined
+        })
+      : this.service.create({ name: val.name, email: val.email, password: val.password, role: val.role });
 
     obs.subscribe({
       next: () => { this.saving.set(false); this.closeModal(); },

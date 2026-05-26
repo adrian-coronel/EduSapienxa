@@ -1,6 +1,0 @@
-<Solution>
-  <Project Path="EduSapienxa.API.csproj" />
-  <Project Path="EduSapienxa.Application/EduSapienxa.Application.csproj" />
-  <Project Path="EduSapienxa.Domain/EduSapienxa.Domain.csproj" />
-  <Project Path="EduSapienxa.Infrastructure/EduSapienxa.Infrastructure.csproj" />
-</Solution>

@@ -15,27 +15,27 @@ export class UserService {
 
   loadAll() {
     this.loading.set(true);
-    this.http.get<AppUser[]>(`${this.apiUrl}/users`).subscribe({
+    this.http.get<AppUser[]>(`${this.apiUrl}/admin/users`).subscribe({
       next: data => { this.users.set(data); this.loading.set(false); },
       error: err => { this.error.set(err.message); this.loading.set(false); }
     });
   }
 
   create(dto: CreateUserDto) {
-    return this.http.post<AppUser>(`${this.apiUrl}/users`, dto).pipe(
+    return this.http.post<AppUser>(`${this.apiUrl}/admin/users`, dto).pipe(
       tap(() => this.loadAll())
     );
   }
 
   update(id: string, dto: UpdateUserDto) {
-    return this.http.put<AppUser>(`${this.apiUrl}/users/${id}`, dto).pipe(
+    return this.http.put<AppUser>(`${this.apiUrl}/admin/users/${id}`, dto).pipe(
       tap(() => this.loadAll())
     );
   }
 
   deactivate(id: string) {
-    return this.http.delete(`${this.apiUrl}/users/${id}`).pipe(
-      tap(() => this.loadAll())
-    );
+    const user = this.users().find(u => u.id === id);
+    if (!user) return this.http.get('');
+    return this.update(id, { name: user.name, email: user.email, role: user.role, isActive: false });
   }
 }
