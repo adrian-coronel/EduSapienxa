@@ -17,7 +17,7 @@ COPY . .
 # El script de build hace dos cosas:
 # 1. Tailwind CLI compila y minifica los estilos
 # 2. ng build compila Angular en modo producción
-RUN npm run build
+RUN npm run build --configuration production
 
 # ═══════════════════════════════════════════════════════════
 # ETAPA 2 — SERVE
