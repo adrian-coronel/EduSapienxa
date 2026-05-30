@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "concurrently \"npx @tailwindcss/cli -i src/styles.css -o src/styles.compiled.css --watch\" \"ng serve\"",
-    "build": "npx @tailwindcss/cli -i src/styles.css -o src/styles.compiled.css --minify && ng build",
+    "build": "npx @tailwindcss/cli -i src/styles.css -o src/styles.compiled.css --minify && ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "tailwind:build": "npx @tailwindcss/cli -i src/styles.css -o src/styles.compiled.css",
