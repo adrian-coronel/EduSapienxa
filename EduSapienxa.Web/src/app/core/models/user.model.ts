@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'editor';
+export type UserRole = 'superadmin' | 'admin' | 'editor';
 
 export interface AppUser {
   id: string;
@@ -6,6 +6,7 @@ export interface AppUser {
   email: string;
   role: UserRole;
   isActive: boolean;
+  companyId?: string | null;
 }
 
 export interface CreateUserDto {
@@ -13,6 +14,7 @@ export interface CreateUserDto {
   email: string;
   password: string;
   role: UserRole;
+  companyId?: string | null;
 }
 
 export interface UpdateUserDto {

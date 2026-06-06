@@ -8,8 +8,12 @@ export interface LoginResponse {
   expiration: string;
 }
 
+export type AdminRole = 'superadmin' | 'admin' | 'editor';
+
 export interface TokenClaims {
   userId: string;
   email: string;
-  role: 'admin' | 'editor';
+  role: AdminRole;
+  companyId?: string;
+  companyName?: string;
 }

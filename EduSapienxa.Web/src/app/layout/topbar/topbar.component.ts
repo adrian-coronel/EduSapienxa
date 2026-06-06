@@ -1,7 +1,8 @@
-import { Component, inject, signal, Output, EventEmitter } from '@angular/core';
+import { Component, inject, signal, Output, EventEmitter, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { NgIf } from '@angular/common';
+import { CompanyService } from '../../core/services/company.service';
+import { NgIf, NgFor, NgClass } from '@angular/common';
 import { filter } from 'rxjs/operators';
 
 const PAGE_TITLES: Record<string, string> = {
@@ -17,7 +18,7 @@ const PAGE_TITLES: Record<string, string> = {
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [NgIf],
+  imports: [NgIf, NgFor, NgClass],
   template: `
     <header class="sticky top-0 z-30 flex h-[var(--topbar-h)] flex-shrink-0 items-center
                    border-b border-[var(--color-border)]
@@ -48,7 +49,35 @@ const PAGE_TITLES: Record<string, string> = {
       </div>
 
       <!-- ── Right: actions ─────────────────────────────────── -->
-      <div class="ml-auto flex items-center gap-1">
+      <div class="ml-auto flex items-center gap-2">
+
+        <!-- Company switcher (superadmin only) -->
+        <div *ngIf="auth.isSuperadmin()"
+             class="flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-sm transition-colors"
+             [ngClass]="auth.currentUser()?.companyId
+               ? 'border-[var(--color-border)] bg-[var(--color-card)]'
+               : 'border-amber-400 bg-amber-50'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+               class="h-4 w-4 flex-shrink-0"
+               [ngClass]="auth.currentUser()?.companyId
+                 ? 'text-[var(--color-muted-foreground)]'
+                 : 'text-amber-500'">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5
+                     m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75
+                     c.621 0 1.125.504 1.125 1.125V21"/>
+          </svg>
+          <select
+            [value]="auth.currentUser()?.companyId ?? ''"
+            (change)="onCompanyChange($event)"
+            [disabled]="switchingCompany()"
+            class="bg-transparent text-sm outline-none cursor-pointer
+                   text-[var(--color-foreground)] disabled:opacity-50 disabled:cursor-default
+                   max-w-[160px]">
+            <option value="" disabled>— Selecciona empresa —</option>
+            <option *ngFor="let c of companySvc.companies()" [value]="c.id">{{ c.name }}</option>
+          </select>
+        </div>
 
         <!-- Dark mode toggle -->
         <button
@@ -145,13 +174,15 @@ const PAGE_TITLES: Record<string, string> = {
     ></div>
   `
 })
-export class TopbarComponent {
+export class TopbarComponent implements OnInit {
   @Output() menuToggle = new EventEmitter<void>();
 
   auth = inject(AuthService);
+  companySvc = inject(CompanyService);
   private router = inject(Router);
 
   dropdownOpen = signal(false);
+  switchingCompany = signal(false);
   pageTitle = signal('Dashboard');
 
   constructor() {
@@ -160,8 +191,26 @@ export class TopbarComponent {
     ).subscribe((e: any) => {
       this.pageTitle.set(PAGE_TITLES[e.urlAfterRedirects] ?? 'Dashboard');
     });
-    // Set initial title
     this.pageTitle.set(PAGE_TITLES[this.router.url] ?? 'Dashboard');
+  }
+
+  ngOnInit() {
+    if (this.auth.isSuperadmin()) {
+      this.companySvc.loadAll();
+    }
+  }
+
+  onCompanyChange(event: Event) {
+    const companyId = (event.target as HTMLSelectElement).value;
+    if (!companyId) return;
+    this.switchingCompany.set(true);
+    this.auth.switchCompany(companyId).subscribe({
+      next: () => {
+        this.switchingCompany.set(false);
+        this.router.navigateByUrl(this.router.url);
+      },
+      error: () => this.switchingCompany.set(false)
+    });
   }
 
   toggleDark(): void {

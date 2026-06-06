@@ -18,7 +18,7 @@ interface NavItem {
   icon: string;
   route: string;
   exact?: boolean;
-  adminOnly?: boolean;
+  roles?: string[];
 }
 
 interface NavGroup {
@@ -194,7 +194,7 @@ export class SidebarComponent {
   @Output() mobileOpenChange = new EventEmitter<boolean>();
   @Output() collapsedChange  = new EventEmitter<boolean>();
 
-  private auth = inject(AuthService);
+  auth = inject(AuthService);
   collapsed = signal(false);
 
   private readonly navGroups: NavGroup[] = [
@@ -265,6 +265,22 @@ export class SidebarComponent {
       ]
     },
     {
+      label: 'Conocimiento',
+      items: [
+        {
+          label: 'Documentos',
+          route: '/documents',
+          icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                   <path stroke-linecap="round" stroke-linejoin="round"
+                     d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5
+                        a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125
+                        v17.25c0 .621.504 1.125 1.125 1.125h12.75
+                        c.621 0 1.125-.504 1.125-1.125V11.25"/>
+                 </svg>`
+        }
+      ]
+    },
+    {
       label: 'Sistema',
       items: [
         {
@@ -276,9 +292,20 @@ export class SidebarComponent {
                  </svg>`
         },
         {
+          label: 'Empresas',
+          route: '/companies',
+          roles: ['superadmin'],
+          icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                   <path stroke-linecap="round" stroke-linejoin="round"
+                     d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5
+                        m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75
+                        c.621 0 1.125.504 1.125 1.125V21"/>
+                 </svg>`
+        },
+        {
           label: 'Usuarios',
           route: '/users',
-          adminOnly: true,
+          roles: ['admin', 'superadmin'],
           icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
                    <path stroke-linecap="round" stroke-linejoin="round"
                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -289,14 +316,15 @@ export class SidebarComponent {
   ];
 
   // computed() so OnPush correctly tracks auth signal changes
-  visibleGroups = computed(() =>
-    this.navGroups
+  visibleGroups = computed(() => {
+    const role = this.auth.currentUser()?.role;
+    return this.navGroups
       .map(g => ({
         ...g,
-        items: g.items.filter(i => !i.adminOnly || this.auth.hasRole('admin'))
+        items: g.items.filter(i => !i.roles || (role !== undefined && i.roles.includes(role)))
       }))
-      .filter(g => g.items.length > 0)
-  );
+      .filter(g => g.items.length > 0);
+  });
 
   doToggleCollapsed(): void {
     this.collapsed.update(v => !v);

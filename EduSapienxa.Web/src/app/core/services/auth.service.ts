@@ -16,6 +16,8 @@ export class AuthService {
 
   currentUser = this._claims.asReadonly();
   isAuthenticated = computed(() => !!this._token());
+  isSuperadmin = computed(() => this._claims()?.role === 'superadmin');
+  isAdmin = computed(() => this._claims()?.role === 'admin');
 
   login(dto: LoginRequest) {
     return this.http.post<LoginResponse>(`${this.env.apiUrl}/admin/auth/login`, dto).pipe(
@@ -42,6 +44,19 @@ export class AuthService {
     return this._claims()?.role === role;
   }
 
+  switchCompany(companyId: string) {
+    return this.http.post<{ token: string; expiresAt: string; companyId: string; companyName: string }>(
+      `${this.env.apiUrl}/admin/auth/switch-company`,
+      { companyId }
+    ).pipe(
+      tap(res => {
+        localStorage.setItem('token', res.token);
+        this._token.set(res.token);
+        this._claims.set(this.parseToken(res.token));
+      })
+    );
+  }
+
   private parseToken(token: string | null): TokenClaims | null {
     if (!token) return null;
     try {
@@ -49,7 +64,9 @@ export class AuthService {
       return {
         userId: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ?? payload.sub ?? payload.userId,
         email: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ?? payload.email,
-        role: (payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ?? payload.role ?? 'editor').toLowerCase()
+        role: (payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ?? payload.role ?? 'editor').toLowerCase(),
+        companyId: payload['company_id'] ?? undefined,
+        companyName: payload['company_name'] ?? undefined,
       };
     } catch {
       return null;

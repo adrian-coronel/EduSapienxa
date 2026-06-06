@@ -233,7 +233,10 @@ export class LoginComponent {
     this.errorMsg.set(null);
 
     this.auth.login(this.form.value as any).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
+      next: () => {
+        const target = this.auth.isSuperadmin() ? '/companies' : '/dashboard';
+        this.router.navigate([target]);
+      },
       error: () => {
         this.errorMsg.set('Credenciales inválidas. Verifica tu correo y contraseña.');
         this.loading.set(false);
